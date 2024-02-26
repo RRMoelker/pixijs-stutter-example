@@ -1,0 +1,11 @@
+{
+  "name": "pixijs-stutter-example",
+  "version": "1.0.0",
+  "description": "A simple Node.js web server",
+  "scripts": {
+    "start": "http-server"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
