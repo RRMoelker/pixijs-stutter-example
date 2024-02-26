@@ -1,8 +1,63 @@
 <!doctype html>
 <html>
 <head>
+    <script src="https://pixijs.download/release/pixi.js"></script>
 </head>
 <body>
-<h1>Hello PixiJS</h1>
+<script>
+    const TimingMethod = {
+        deltaFrames: 'deltaFrames',
+        performanceNow: 'performance.now',
+        elapsedMs: 'elapsedMs'
+    };
+    Object.freeze(TimingMethod);
+
+    const timingMethod = TimingMethod.elapsedMs
+    const showRuler = true;
+    const frameRate = 60; // Set to monitor framerate
+    const speedMs = 1.0; // px/ms
+    const msPerFrame = 1000.0 / frameRate
+    const speedPerFrame = msPerFrame * speedMs;
+    const rulerStep = 200;
+
+    const app = new PIXI.Application({width: 1920, height: 1080});
+    document.body.appendChild(app.view);
+    const graphic = new PIXI.Graphics();
+    graphic.clear()
+    graphic.beginFill(0xff0000);
+    graphic.drawRoundedRect(0, 500, 100, 40, 4);
+    graphic.endFill()
+    app.stage.addChild(graphic)
+    if (showRuler) {
+        const ruler = new PIXI.Container();
+        for (let i = 0; i < 1920 / rulerStep; ++i) {
+            const line = new PIXI.Graphics();
+            line.clear()
+            line.beginFill(0xffffff);
+            line.drawRect(i * rulerStep, 400, 2, 100);
+            line.endFill()
+            ruler.addChild(line)
+        }
+        app.stage.addChild(ruler)
+    }
+
+    let elapsedMs = 0.0;
+    app.ticker.add((deltaFrames) => {
+        switch (timingMethod) {
+            case TimingMethod.deltaFrames:
+                graphic.x = (graphic.x + deltaFrames * speedPerFrame) % 1920;
+                break;
+            case TimingMethod.performanceNow:
+                graphic.x = (performance.now() * speedMs) % 1920;
+                break;
+            case TimingMethod.elapsedMs:
+                elapsedMs += app.ticker.elapsedMS;
+                graphic.x = (elapsedMs) % 1920;
+                break;
+            default:
+                throw new Error(`Unknown method: ${timingMethod}`);
+        }
+    });
+</script>
 </body>
 </html>
